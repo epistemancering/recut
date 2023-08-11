@@ -4,20 +4,20 @@ let simpleRenders = {}
 let customTests = []
 let customValues = []
 let customRenders = []
-let slices = {
+let recut = {
     "listen": function(test, render) {
         if (typeof test === "string") {
             react.useState(function() {
                 if (simpleRenders[test]) {
                     simpleRenders[test].push(render[1])
                 } else {
-                    simpleValues[test] = slices[test]
+                    simpleValues[test] = recut[test]
                     simpleRenders[test] = [render[1]]
                 }
             })
-            return slices[test]
+            return recut[test]
         } else {
-            let result = test(slices)
+            let result = test(recut)
             react.useState(function() {
                 customTests.push(test)
                 customValues.push(result)
@@ -30,20 +30,20 @@ let slices = {
         if (value !== undefined) {
             simpleValues[name] = value
         }
-        if (slices[name] !== simpleValues[name]) {
-            slices[name] = simpleValues[name]
+        if (recut[name] !== simpleValues[name]) {
+            recut[name] = simpleValues[name]
             for (let index in simpleRenders[name]) {
                 simpleRenders[name][index]({})
             }
             for (let index in customRenders) {
-                let result = customTests[index](slices)
+                let result = customTests[index](recut)
                 if (customValues[index] !== result) {
                     customValues[index] = result
                     customRenders[index]({})
                 }
             }
         }
-        return slices[name]
+        return recut[name]
     }
 }
-export default slices
+export default recut
